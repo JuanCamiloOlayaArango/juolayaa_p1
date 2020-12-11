@@ -12,4 +12,6 @@ Ejecutar las siguientes líneas para instalar las librerías:
 
 pip install -r requirements.txt
 
+![Launcher](launcher.png)
+
 ![Juego](game.png)
