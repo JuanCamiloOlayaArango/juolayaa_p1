@@ -3,26 +3,22 @@ import pygame
 import numpy
 import time
 import tkinter
-
-#Establecemos resolución
-NX = 0
-NY = 0
-Ancho = 0
-Alto = 0
-Descanso = 0.1
+from tkinter import ttk
+from tkinter import messagebox as msg
 def main():
     """
     Inicia los parámetros de la ventana de configuración
     """
     #Ventana inicial
     ventana_inicio = tkinter.Tk()
-    ventana_inicio.geometry("600x600")
+    ventana_inicio.geometry("500x350")
     ventana_inicio.title("Game of life")
+    ventana_inicio.configure(bg = "black")
     #Elementos
-    in_ancho = tkinter.Entry(ventana_inicio)
-    in_alto = tkinter.Entry(ventana_inicio)
-    in_nX = tkinter.Entry(ventana_inicio)
-    in_nY = tkinter.Entry(ventana_inicio)
+    in_ancho = tkinter.Entry(ventana_inicio, bg = "gray", fg = "black", justify = "center")
+    in_alto = tkinter.Entry(ventana_inicio, bg = "gray", fg = "black", justify = "center")
+    in_nX = tkinter.Entry(ventana_inicio, bg = "gray", fg = "black", justify = "center")
+    in_nY = tkinter.Entry(ventana_inicio, bg = "gray", fg = "black", justify = "center")
     show(ventana_inicio, in_ancho, in_alto, in_nX, in_nY)
 
     #Función de inicio
@@ -36,14 +32,21 @@ def Iniciar(in_nX, in_nY, in_ancho, in_alto, ventana_inicio):
     :param Entry in_nX: Entrada del ancho de la rejilla.
     :param Entry in_nY: Entrada del alto de la rejilla.
     """
-    global NX
-    NX = int(in_nX.get())
-    global NY
-    NY = int(in_nY.get())
-    global Ancho
-    Ancho = int(in_ancho.get())
-    global Alto
-    Alto = int(in_alto.get())
+    #Establecemos resolución
+    NX = 0
+    NY = 0
+    Ancho = 0
+    Alto = 0
+    try:
+        NX = int(in_nX.get())
+        NY = int(in_nY.get())
+        Ancho = int(in_ancho.get())
+        Alto = int(in_alto.get())
+    except:
+        NX = 20
+        NY = 20
+        Ancho = 600
+        Alto = 600
     ventana_inicio.destroy()
     dimen(NX, NY, Ancho, Alto)
 
@@ -59,25 +62,30 @@ def show(ventana_inicio, in_ancho, in_alto, in_nX, in_nY):
     """
     #Objetos de la ventana
     inicio = lambda: Iniciar(in_nX, in_nY, in_ancho, in_alto, ventana_inicio)
-    titulo = tkinter.Label(ventana_inicio, text = "El juego de la vida")
-    Res = tkinter.Label(ventana_inicio, text = "Resolución")
-    Anch = tkinter.Label(ventana_inicio, text = "Ancho")
-    Alt = tkinter.Label(ventana_inicio, text = "Alto")
-    RX = tkinter.Label(ventana_inicio, text = "Rejilla horizontal")
-    RY = tkinter.Label(ventana_inicio, text = "Rejilla vertical")
-    StarButton = tkinter.Button(ventana_inicio, text = "Crear", command = inicio)
-    titulo.pack()
-    Res.pack()
-    Anch.pack()
-    in_ancho.pack()
-    Alt.pack()
-    in_alto.pack()
-    RX.pack()
-    in_nX.pack()
-    RY.pack()
-    in_nY.pack()
-    StarButton.pack()
-
+    titulo = tkinter.Label(ventana_inicio, text = "El juego de la vida", font = ("Arial bold", 18), bg = "Black", fg = "white")
+    Res = tkinter.Label(ventana_inicio, text = "Resolución", font = ("Arial bold", 15), bg = "black", fg = "white")
+    Anch = tkinter.Label(ventana_inicio, text = "Ancho", bg = "black", fg = "white")
+    Alt = tkinter.Label(ventana_inicio, text = "Alto", bg = "black", fg = "white")
+    Rej = tkinter.Label(ventana_inicio, text = "Rejilla", font = ("Arial bold", 15), bg = "black", fg = "white")
+    RX = tkinter.Label(ventana_inicio, text = "Rejilla horizontal", bg = "black", fg = "white")
+    RY = tkinter.Label(ventana_inicio, text = "Rejilla vertical", bg = "black", fg = "white")
+    StarButton = tkinter.Button(ventana_inicio, text = "Crear", command = inicio, bg = "gray", fg = "white")
+    Tuto = tkinter.Label(ventana_inicio, text = "Instrucciones: ", font = ("Arial bold", 12), bg = "black", fg = "white")
+    Indic = tkinter.Label(ventana_inicio, text = "Pulse las teclas F1, F2, F3 o F4 para guardar \nPulse las teclas 1, 2, 3 o 4 para cargar los respectivos estados guardados \nPulse Escape para cerrar el juego \nPulse espacio para pausar o reanudar el juego \nPulse F para aumentar la velocidad o S para descenderla \nClick izquierdo para añadir una célula y click derecho para borrarla", bg = "black", fg = "white")
+    titulo.grid(column = 1, row = 0)
+    Res.grid(column = 0, row = 1)
+    Anch.grid(column = 0, row = 2)
+    in_ancho.grid(column = 1, row = 2)
+    Alt.grid(column = 0, row = 3)
+    in_alto.grid(column = 1, row = 3)
+    Rej.grid(column = 0, row = 4)
+    RX.grid(column = 0, row = 5)
+    in_nX.grid(column = 1, row = 5)
+    RY.grid(column = 0, row = 7)
+    in_nY.grid(column = 1, row = 7)
+    StarButton.grid(column = 1, row = 8)
+    Tuto.grid(column = 1, row = 9)
+    Indic.grid(column = 1, row = 10)
     ventana_inicio.mainloop()
 
 def dimen(NX, NY, Ancho, Alto):
@@ -140,17 +148,63 @@ def Game(xSize, ySize, nX, nY, screen, bg_color, live_color, dead_color, estado)
     Pausa = False
 
     run = True
+    save = []
+    for i in range(4):
+        save.append((estado))
+    edit = 0.1
     while run:
-
         nuevo_estado = numpy.copy(estado) # Copiar estado
         Descanso = 0
-
         for i in pygame.event.get():   #Definimos controles
             if i.type == pygame.QUIT:   #Cerrar el juego
                 run = False
 
-            if i.type == pygame.KEYDOWN:    #Presionar teclas para pausar
-                Pausa = not Pausa
+            if i.type == pygame.KEYDOWN:    #Presionar espacio para pausar
+                if i.key == pygame.K_SPACE:
+                    Pausa = not Pausa
+                if i.key == pygame.K_ESCAPE:    #Escape para salir
+                    pygame.quit()
+                    main()
+                if i.key == pygame.K_F1:        #Slots de guardado
+                    save[0] = numpy.copy(estado)
+                    time.sleep(Descanso)
+                if i.key == pygame.K_F2:
+                    save[1] = numpy.copy(estado)
+                    time.sleep(Descanso)
+                if i.key == pygame.K_F3:
+                    save[2] = numpy.copy(estado)
+                    time.sleep(Descanso)
+                if i.key == pygame.K_F4:
+                    save[3] = numpy.copy(estado)
+                    time.sleep(Descanso)
+                if i.key == pygame.K_1 or i.key == pygame.K_KP1:
+                    estado = numpy.copy(save[0])
+                    nuevo_estado = numpy.copy(save[0])
+                    pygame.display.flip()
+                    time.sleep(Descanso)
+                if i.key == pygame.K_2 or i.key == pygame.K_KP2:
+                    estado = numpy.copy(save[1])
+                    nuevo_estado = numpy.copy(save[1])
+                    pygame.display.flip()
+                    time.sleep(Descanso)
+                if i.key == pygame.K_3 or i.key == pygame.K_KP3:
+                    estado = numpy.copy(save[2])
+                    nuevo_estado = numpy.copy(save[2])
+                    pygame.display.flip()
+                    time.sleep(Descanso)
+                if i.key == pygame.K_4 or i.key == pygame.K_KP4:
+                    estado = numpy.copy(save[3])
+                    nuevo_estado = numpy.copy(save[3])
+                    pygame.display.flip()
+                    time.sleep(Descanso)
+                if i.key == pygame.K_f:             #Controles de velocidad
+                    if edit > 0:
+                        edit = round(edit, 2)
+                        edit -= 0.05
+                if i.key == pygame.K_s:
+                    if edit < 0.75:
+                        edit = round(edit, 2)
+                        edit += 0.05
             
             Click = pygame.mouse.get_pressed()  #Registramos los botones del ratón
             if (Click[0] + Click[1] + Click[2]) > 0:
@@ -192,7 +246,10 @@ def Game(xSize, ySize, nX, nY, screen, bg_color, live_color, dead_color, estado)
 
         estado = numpy.copy(nuevo_estado)
         pygame.display.flip()
-        time.sleep(Descanso)
+        if not Pausa:
+            time.sleep(edit)
+        else:
+            time.sleep(Descanso)
 
     pygame.quit()
 
