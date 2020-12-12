@@ -4,7 +4,6 @@ import numpy
 import time
 import tkinter
 from tkinter import ttk
-from tkinter import messagebox as msg
 def main():
     """
     Inicia los parámetros de la ventana de configuración
